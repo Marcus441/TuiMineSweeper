@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <ostream>
 enum class Difficulty { Beginner, Intermediate, Expert, Custom };
 
 struct Point {
@@ -13,6 +14,6 @@ struct Board {
   Board(Difficulty d);
   Point cursor = {0, 0};
 
-  void render();
+  void render(std::ostream &buf);
   void moveCursor(int dx, int dy);
 };

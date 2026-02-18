@@ -23,5 +23,7 @@ TerminalHandler::~TerminalHandler() { this->resetTerminal(); }
 
 TerminalHandler::TerminalHandler() {
   enableRawMode();
-  std::cout << "\e[?25l" << std::flush; // hide cursor
+  // move cursor to home and clear term
+  std::cout << "\033[2J\033[H"
+            << "\e[?25l" << std::flush; // hide cursor
 }

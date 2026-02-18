@@ -25,23 +25,16 @@ Board::Board(Difficulty d) {
   }
 };
 
-void Board::render() {
-  std::cout << "\033[H"; // move cursor to home to avoid flicker
+void Board::render(std::ostream &buf) {
+  buf << "\033[H"; // Home
   for (size_t r = 0; r < rows; ++r) {
     for (size_t c = 0; c < cols; ++c) {
-      if ((r == 0 || r == rows - 1) && (c == 0 || c == cols - 1))
-        std::cout << '+'; // Corners
-      else if (r == 0 || r == rows - 1)
-        std::cout << '-'; // Top/Bottom walls
-      else if (c == 0 || c == cols - 1)
-        std::cout << '|'; // Side walls
-      else if (cursor.x == (int)c && cursor.y == (int)r) {
-        std::cout << '*';
-      } else {
-        std::cout << 'O';
-      }
+      if ((int)r == cursor.y && (int)c == cursor.x)
+        buf << "*";
+      else
+        buf << "O";
     }
-    std::cout << '\n';
+    buf << "\n";
   }
 }
 
