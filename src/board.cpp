@@ -26,19 +26,48 @@ Board::Board(Difficulty d) {
 };
 
 void Board::render(std::ostream &buf) {
-  buf << "\033[H"; // Home
+  buf << "\033[H";
+  // 1. TOP BORDER
+  buf << "┌";
+  for (size_t c = 0; c < cols; ++c) {
+    buf << "───" << (c == cols - 1 ? "┐" : "┬");
+  }
+  buf << "\n";
+
   for (size_t r = 0; r < rows; ++r) {
+    // 2. CELL CONTENT ROW
+    buf << "│";
     for (size_t c = 0; c < cols; ++c) {
-      if ((int)r == cursor.y && (int)c == cursor.x)
-        buf << "*";
+      bool isCursor = (r == cursor.y && c == cursor.x);
+
+      if (isCursor)
+        buf << " * ";
       else
-        buf << "O";
+        buf << " • ";
+
+      buf << "│";
     }
     buf << "\n";
+
+    // 3. ROW DIVIDER (Don't draw after the last row)
+    if (r < rows - 1) {
+      buf << "├";
+      for (size_t c = 0; c < cols; ++c) {
+        buf << "───" << (c == cols - 1 ? "┤" : "┼");
+      }
+      buf << "\n";
+    }
   }
+
+  // 4. BOTTOM BORDER
+  buf << "└";
+  for (size_t c = 0; c < cols; ++c) {
+    buf << "───" << (c == cols - 1 ? "┘" : "┴");
+  }
+  buf << "\n";
 }
 
 void Board::moveCursor(int dx, int dy) {
-  cursor.x = std::clamp(cursor.x + dx, 1, (int)cols - 1);
-  cursor.y = std::clamp(cursor.y + dy, 1, (int)rows - 1);
+  cursor.x = std::clamp(cursor.x + dx, 0, (int)cols - 1);
+  cursor.y = std::clamp(cursor.y + dy, 0, (int)rows - 1);
 }
