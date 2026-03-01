@@ -37,12 +37,16 @@ public:
 
   void render(std::ostream &buf);
   void moveCursor(int dx, int dy);
+  void handleAction();
+  void toggleFlag();
 
 private:
-  Cell &getCell(int x, int y) { return grid.at(y * cols + x); }
   size_t rows;
   size_t cols;
   size_t mines;
+  Point cursor = {0, 0};
+  std::vector<Cell> grid;
+  bool isFirstMove = true;
 
   void setup(size_t r, size_t c, size_t m) {
     rows = r;
@@ -50,11 +54,21 @@ private:
     mines = m;
     grid.assign(rows * cols, Cell{});
   }
+
+  // Utility
+  Cell &getCell(int x, int y) { return grid.at(y * cols + x); }
+  bool isValid(int x, int y) const {
+    return x >= 0 && x < (int)cols && y >= 0 && y < (int)rows;
+  }
+
+  // Renderer
   void renderTopBorder(std::ostream &buf);
   void renderRowDivider(std::ostream &buf, size_t rowIdx);
   void renderCellRow(std::ostream &buf, size_t rowIdx);
   void renderBottomBorder(std::ostream &buf);
 
-  Point cursor = {0, 0};
-  std::vector<Cell> grid;
+  // Board fill
+  void generateMines(int startX, int startY);
+  void calculateNumbers();
+  void reveal(int x, int y);
 };

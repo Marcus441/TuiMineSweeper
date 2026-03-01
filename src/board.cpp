@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <iostream>
 #include <ostream>
+#include <random>
 
 void Board::render(std::ostream &buf) {
   // Move terminal cursor to Home (0,0)
@@ -50,7 +51,6 @@ void Board::renderTopBorder(std::ostream &buf) {
 
     bool highlightJoint =
         (rowActive && ((int)c == cursor.x || (int)c == cursor.x - 1));
-
     if (highlightJoint)
       buf << color;
     buf << (c == cols - 1 ? "┐" : "┬");
@@ -62,6 +62,8 @@ void Board::renderTopBorder(std::ostream &buf) {
 void Board::renderCellRow(std::ostream &buf, size_t rowIdx) {
   bool rowActive = (cursor.y == (int)rowIdx);
   std::string color = "\033[1;33m";
+  std::string red = "\033[31m";
+  std::string errorRed = "\x1B[1;31m";
   std::string reset = "\033[0m";
 
   if (rowActive && cursor.x == 0)
@@ -72,7 +74,23 @@ void Board::renderCellRow(std::ostream &buf, size_t rowIdx) {
 
   for (size_t c = 0; c < cols; ++c) {
 
-    buf << "   ";
+    const Cell &cell = getCell(c, rowIdx);
+    bool isCursor = (rowActive && (int)c == cursor.x);
+
+    if (isCursor) {
+      buf << color << " * " << reset;
+    } else if (!cell.isRevealed) {
+      if (cell.isFlagged)
+        buf << red << " F " << reset;
+      else
+        buf << " • ";
+    } else if (cell.isMine) {
+      buf << errorRed << " X " << reset;
+    } else if (cell.neighborMines == 0) {
+      buf << "   ";
+    } else {
+      buf << " " << cell.neighborMines << " ";
+    }
 
     bool highlighted =
         (rowActive && ((int)c == cursor.x || (int)c == cursor.x - 1));
@@ -145,4 +163,89 @@ void Board::renderBottomBorder(std::ostream &buf) {
   }
   buf << "\n";
   buf << "\n";
+}
+
+void Board::generateMines(int startX, int startY) {
+  std::vector<int> pool;
+  for (size_t i = 0; i < rows * cols; ++i) {
+    int x = i % cols;
+    int y = i / cols;
+    // Skip the 3x3 area around the first click
+    if (std::abs(x - startX) <= 1 && std::abs(y - startY) <= 1)
+      continue;
+    pool.push_back(i);
+  }
+  std::shuffle(pool.begin(), pool.end(), std::mt19937{std::random_device{}()});
+
+  for (size_t i = 0; i < mines && i < pool.size(); ++i) {
+    grid[pool[i]].isMine = true;
+  }
+  calculateNumbers();
+}
+
+void Board::calculateNumbers() {
+  for (size_t y = 0; y < rows; ++y) {
+    for (size_t x = 0; x < cols; ++x) {
+      if (getCell(x, y).isMine)
+        continue;
+
+      int count = 0;
+      // The 8-neighbor loop
+      for (int dy = -1; dy <= 1; ++dy) {
+        for (int dx = -1; dx <= 1; ++dx) {
+          int nx = x + dx;
+          int ny = y + dy;
+          if (isValid(nx, ny) && getCell(nx, ny).isMine) {
+            count++;
+          }
+        }
+      }
+      getCell(x, y).neighborMines = count;
+    }
+  }
+}
+
+void Board::reveal(int x, int y) {
+  // Safety checks: Is it on the board? Is it already revealed or flagged?
+  if (!isValid(x, y))
+    return;
+  Cell &cell = getCell(x, y);
+  if (cell.isRevealed || cell.isFlagged)
+    return;
+
+  // Reveal this specific cell
+  cell.isRevealed = true;
+
+  // If it's a mine, Game Over (handle this in your game loop)
+  if (cell.isMine)
+    return;
+
+  // If it's a "0", recursively reveal all 8 neighbors
+  if (cell.neighborMines == 0) {
+    for (int dy = -1; dy <= 1; ++dy) {
+      for (int dx = -1; dx <= 1; ++dx) {
+        // Avoid infinite recursion by checking the neighbor
+        reveal(x + dx, y + dy);
+      }
+    }
+  }
+}
+
+void Board::handleAction() {
+  if (isFirstMove) {
+    generateMines(cursor.x, cursor.y);
+    isFirstMove = false;
+  }
+
+  if (getCell(cursor.x, cursor.y).isFlagged)
+    return;
+
+  reveal(cursor.x, cursor.y);
+}
+
+void Board::toggleFlag() {
+  Cell &c = getCell(cursor.x, cursor.y);
+  if (!c.isRevealed) {
+    c.isFlagged = !c.isFlagged;
+  }
 }

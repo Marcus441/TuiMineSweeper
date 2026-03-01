@@ -38,6 +38,17 @@ int main(int argc, char *argv[]) {
       if (c == 'd')
         board.moveCursor(1, 0);
 
+      else if (c == ' ') {
+        board.handleAction();
+      }
+
+      else if (c == 'f') {
+        board.toggleFlag();
+      }
+
+      else if (c == 'q') {
+        exit_loop = true;
+      }
       // std::cout << "\r[DEBUG] [" << c << " : " << (int)c << "] "
       //           << "BUFF SIZE: " << buf.view().size() << std::flush;
     };
