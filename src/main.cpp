@@ -1,7 +1,6 @@
 #include "board.h"
 #include "terminal.h"
 
-#include <cstdlib>
 #include <iostream>
 #include <sstream>
 #include <sys/ioctl.h>

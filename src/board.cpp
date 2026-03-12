@@ -75,11 +75,12 @@ void Board::renderCellRow(std::ostream &buf, size_t rowIdx) {
   for (size_t c = 0; c < cols; ++c) {
 
     const Cell &cell = getCell(c, rowIdx);
-    bool isCursor = (rowActive && (int)c == cursor.x);
+    // bool isCursor = (rowActive && (int)c == cursor.x);
 
-    if (isCursor) {
-      buf << color << " * " << reset;
-    } else if (!cell.isRevealed) {
+    // if (isCursor) {
+    //   buf << color << " * " << reset;
+    // } else
+    if (!cell.isRevealed) {
       if (cell.isFlagged)
         buf << red << " F " << reset;
       else
