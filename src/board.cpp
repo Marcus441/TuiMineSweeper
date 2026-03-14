@@ -74,7 +74,7 @@ void Board::renderCellRow(std::ostream &buf, size_t rowIdx) {
 
   for (size_t c = 0; c < cols; ++c) {
 
-    const Cell &cell = getCell(c, rowIdx);
+    const Cell &cell = internalGetCell(c, rowIdx);
     // bool isCursor = (rowActive && (int)c == cursor.x);
 
     // if (isCursor) {
@@ -187,7 +187,7 @@ void Board::generateMines(int startX, int startY) {
 void Board::calculateNumbers() {
   for (size_t y = 0; y < rows; ++y) {
     for (size_t x = 0; x < cols; ++x) {
-      if (getCell(x, y).isMine)
+      if (internalGetCell(x, y).isMine)
         continue;
 
       int count = 0;
@@ -196,56 +196,44 @@ void Board::calculateNumbers() {
         for (int dx = -1; dx <= 1; ++dx) {
           int nx = x + dx;
           int ny = y + dy;
-          if (isValid(nx, ny) && getCell(nx, ny).isMine) {
+          if (isValid(nx, ny) && internalGetCell(nx, ny).isMine) {
             count++;
           }
         }
       }
-      getCell(x, y).neighborMines = count;
+      internalGetCell(x, y).neighborMines = count;
     }
   }
 }
 
-void Board::reveal(int x, int y) {
+RevealResult Board::reveal(int x, int y) {
   // Safety checks: Is it on the board? Is it already revealed or flagged?
   if (!isValid(x, y))
-    return;
-  Cell &cell = getCell(x, y);
+    return RevealResult::Invalid;
+  Cell &cell = internalGetCell(x, y);
   if (cell.isRevealed || cell.isFlagged)
-    return;
+    return RevealResult::Invalid;
 
-  // Reveal this specific cell
   cell.isRevealed = true;
 
-  // If it's a mine, Game Over (handle this in your game loop)
   if (cell.isMine)
-    return;
+    return RevealResult::Mine;
 
-  // If it's a "0", recursively reveal all 8 neighbors
+  // recursively reveal all 8 neighbors
   if (cell.neighborMines == 0) {
     for (int dy = -1; dy <= 1; ++dy) {
       for (int dx = -1; dx <= 1; ++dx) {
-        // Avoid infinite recursion by checking the neighbor
         reveal(x + dx, y + dy);
       }
     }
   }
+  return RevealResult::Safe;
 }
 
-void Board::handleAction() {
-  if (isFirstMove) {
-    generateMines(cursor.x, cursor.y);
-    isFirstMove = false;
-  }
-
-  if (getCell(cursor.x, cursor.y).isFlagged)
-    return;
-
-  reveal(cursor.x, cursor.y);
-}
+void Board::initialize() { generateMines(cursor.x, cursor.y); }
 
 void Board::toggleFlag() {
-  Cell &c = getCell(cursor.x, cursor.y);
+  Cell &c = internalGetCell(cursor.x, cursor.y);
   if (!c.isRevealed) {
     c.isFlagged = !c.isFlagged;
   }

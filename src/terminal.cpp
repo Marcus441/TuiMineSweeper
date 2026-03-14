@@ -1,6 +1,5 @@
 #include "terminal.h"
 
-#include <cstdlib>
 #include <iostream>
 #include <ostream>
 #include <sys/ioctl.h>

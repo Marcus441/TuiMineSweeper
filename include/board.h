@@ -1,6 +1,11 @@
+#pragma once
+
 #include <cstddef>
 #include <ostream>
 #include <vector>
+
+enum class RevealResult { Invalid, Safe, Mine };
+
 enum class Difficulty { Beginner, Intermediate, Expert, Custom };
 
 struct Point {
@@ -37,8 +42,12 @@ public:
 
   void render(std::ostream &buf);
   void moveCursor(int dx, int dy);
-  void handleAction();
+  void initialize();
   void toggleFlag();
+  RevealResult reveal(int x, int y);
+
+  const Point &getCursor() const { return cursor; }
+  const Cell &getCell(int x, int y) const { return grid.at(y * cols + x); }
 
 private:
   size_t rows;
@@ -46,7 +55,6 @@ private:
   size_t mines;
   Point cursor = {0, 0};
   std::vector<Cell> grid;
-  bool isFirstMove = true;
 
   void setup(size_t r, size_t c, size_t m) {
     rows = r;
@@ -56,7 +64,6 @@ private:
   }
 
   // Utility
-  Cell &getCell(int x, int y) { return grid.at(y * cols + x); }
   bool isValid(int x, int y) const {
     return x >= 0 && x < (int)cols && y >= 0 && y < (int)rows;
   }
@@ -70,5 +77,5 @@ private:
   // Board fill
   void generateMines(int startX, int startY);
   void calculateNumbers();
-  void reveal(int x, int y);
+  Cell &internalGetCell(int x, int y) { return grid.at(y * cols + x); }
 };
