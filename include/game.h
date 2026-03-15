@@ -1,4 +1,5 @@
 #pragma once
+
 #include <board.h>
 #include <sstream>
 
@@ -6,7 +7,8 @@ enum class GameState { BEGIN, PLAYING, PAUSED, LOST, FINISHED };
 
 class Game {
 public:
-  Game(Difficulty d) : frameBuffer(), board(Board(d)) {};
+  Game() : frameBuffer(), board(Board()) {}
+  Game(Difficulty d) : frameBuffer(), board(Board(d)) {}
   Game(Game &&) = default;
   Game(const Game &) = delete;
   Game &operator=(Game &&) = default;
@@ -23,6 +25,7 @@ private:
   void updateLogic();
   void renderFrame();
 
+  bool checkWin();
   void handleWin();
   void handleLoss();
 };

@@ -1,15 +1,18 @@
 #include "board.h"
+#include <cstdlib>
 #include <game.h>
 #include <iostream>
 #include <unistd.h>
 
 void Game::run() {
 
+  renderFrame();
   while (state != GameState::FINISHED) {
-    renderFrame();
     processInput();
+    renderFrame();
   }
 }
+
 void Game::processInput() {
   char c;
   if (read(STDIN_FILENO, &c, 1) == 1) {
@@ -54,6 +57,10 @@ void Game::updateLogic() {
   RevealResult outcome = board.reveal(cursor.x, cursor.y);
   switch (outcome) {
   case RevealResult::Safe:
+    if (checkWin()) {
+      std::cout << "[DEBUG] Game won" << checkWin();
+      state = GameState::FINISHED;
+    };
     return;
     break;
   case RevealResult::Invalid:
@@ -61,7 +68,7 @@ void Game::updateLogic() {
     return;
     break;
   case RevealResult::Mine:
-    // handleLoss();
+    state = GameState::FINISHED;
     return;
     break;
   }
@@ -74,3 +81,9 @@ void Game::renderFrame() {
   board.render(frameBuffer);
   std::cout << frameBuffer.view() << std::flush;
 };
+
+bool Game::checkWin() {
+  std::cout << "[DEBUG] Safe cells:" << board.getRevealedSafeCells() << '\n';
+  std::cout << "[DEBUG] Total cells:" << board.getTotalSafeCells() << '\n';
+  return board.getRevealedSafeCells() == board.getTotalSafeCells();
+}

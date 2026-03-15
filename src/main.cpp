@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
   TerminalHandler term;
-  Game game = Game(Difficulty::Intermediate);
+  Game game = Game();
   game.run();
 
   return 0;

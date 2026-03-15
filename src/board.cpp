@@ -31,7 +31,7 @@ void Board::moveCursor(int dx, int dy) {
 
 void Board::renderTopBorder(std::ostream &buf) {
   bool rowActive = (cursor.y == 0);
-  std::string color = "\033[1;34m";
+  std::string color = "\033[1;32m";
   std::string reset = "\033[0m";
 
   if (rowActive && cursor.x == 0)
@@ -181,6 +181,7 @@ void Board::generateMines(int startX, int startY) {
   for (size_t i = 0; i < mines && i < pool.size(); ++i) {
     grid[pool[i]].isMine = true;
   }
+  total_safe_cells = (rows * cols) - mines;
   calculateNumbers();
 }
 
@@ -227,6 +228,7 @@ RevealResult Board::reveal(int x, int y) {
       }
     }
   }
+  ++revealed_safe_cells;
   return RevealResult::Safe;
 }
 

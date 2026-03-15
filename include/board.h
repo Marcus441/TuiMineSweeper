@@ -48,11 +48,15 @@ public:
 
   const Point &getCursor() const { return cursor; }
   const Cell &getCell(int x, int y) const { return grid.at(y * cols + x); }
+  const size_t &getRevealedSafeCells() const { return revealed_safe_cells; }
+  const size_t &getTotalSafeCells() const { return total_safe_cells; }
 
 private:
   size_t rows;
   size_t cols;
   size_t mines;
+  size_t revealed_safe_cells{};
+  size_t total_safe_cells{};
   Point cursor = {0, 0};
   std::vector<Cell> grid;
 
