@@ -31,7 +31,7 @@ void Board::moveCursor(int dx, int dy) {
 
 void Board::renderTopBorder(std::ostream &buf) {
   bool rowActive = (cursor.y == 0);
-  std::string color = "\033[1;33m";
+  std::string color = "\033[1;34m";
   std::string reset = "\033[0m";
 
   if (rowActive && cursor.x == 0)
@@ -61,7 +61,7 @@ void Board::renderTopBorder(std::ostream &buf) {
 
 void Board::renderCellRow(std::ostream &buf, size_t rowIdx) {
   bool rowActive = (cursor.y == (int)rowIdx);
-  std::string color = "\033[1;33m";
+  std::string color = "\033[1;32m";
   std::string red = "\033[31m";
   std::string errorRed = "\x1B[1;31m";
   std::string reset = "\033[0m";
@@ -107,7 +107,7 @@ void Board::renderCellRow(std::ostream &buf, size_t rowIdx) {
 void Board::renderRowDivider(std::ostream &buf, size_t rowIdx) {
   bool isCursorRowLine =
       (cursor.y == (int)rowIdx || cursor.y == (int)rowIdx + 1);
-  std::string color = "\033[1;33m";
+  std::string color = "\033[1;32m";
   std::string reset = "\033[0m";
 
   if (isCursorRowLine && cursor.x == 0)
@@ -137,7 +137,7 @@ void Board::renderRowDivider(std::ostream &buf, size_t rowIdx) {
 
 void Board::renderBottomBorder(std::ostream &buf) {
   bool rowActive = (cursor.y == (int)rows - 1);
-  std::string color = "\033[1;33m";
+  std::string color = "\033[1;34m";
   std::string reset = "\033[0m";
 
   if (rowActive && cursor.x == 0)
