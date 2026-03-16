@@ -11,7 +11,20 @@
   }:
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
+      tsweep = pkgs.stdenv.mkDerivation {
+        pname = "tsweep";
+        version = "0.1.0";
+        src = ./.;
+        nativeBuildInputs = [pkgs.cmake];
+        buildInputs = [];
+      };
     in {
+      packages.default = tsweep;
+      apps.default = {
+        type = "app";
+        program = "${tsweep}/bin/tsweep";
+      };
+
       devShell = pkgs.mkShell {
         name = "C++ DevShell";
 

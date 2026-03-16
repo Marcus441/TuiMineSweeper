@@ -1,5 +1,4 @@
 #include "board.h"
-#include <cstdlib>
 #include <game.h>
 #include <iostream>
 #include <unistd.h>
@@ -58,7 +57,7 @@ void Game::updateLogic() {
   switch (outcome) {
   case RevealResult::Safe:
     if (checkWin()) {
-      std::cout << "[DEBUG] Game won" << checkWin();
+      std::cout << "[DEBUG] Game Won" << '\n';
       state = GameState::FINISHED;
     };
     return;
@@ -68,6 +67,7 @@ void Game::updateLogic() {
     return;
     break;
   case RevealResult::Mine:
+    std::cout << "[DEBUG] Game Lost" << '\n';
     state = GameState::FINISHED;
     return;
     break;
@@ -87,3 +87,6 @@ bool Game::checkWin() {
   std::cout << "[DEBUG] Total cells:" << board.getTotalSafeCells() << '\n';
   return board.getRevealedSafeCells() == board.getTotalSafeCells();
 }
+
+void Game::handleWin() {}
+void Game::handleLoss() {}
