@@ -137,7 +137,7 @@ void Board::renderRowDivider(std::ostream &buf, size_t rowIdx) {
 
 void Board::renderBottomBorder(std::ostream &buf) {
   bool rowActive = (cursor.y == (int)rows - 1);
-  std::string color = "\033[1;34m";
+  std::string color = "\033[1;32m";
   std::string reset = "\033[0m";
 
   if (rowActive && cursor.x == 0)
@@ -230,6 +230,18 @@ RevealResult Board::reveal(int x, int y) {
   }
   ++revealed_safe_cells;
   return RevealResult::Safe;
+}
+
+void Board::revealAllMines() {
+  for (size_t i = 0; i < rows * cols; ++i) {
+    Cell &cell = grid[i];
+
+    if (cell.isMine && !cell.isFlagged) {
+      cell.isRevealed = true;
+    } else if (cell.isFlagged) {
+      cell.isRevealed = true;
+    }
+  }
 }
 
 void Board::initialize() { generateMines(cursor.x, cursor.y); }

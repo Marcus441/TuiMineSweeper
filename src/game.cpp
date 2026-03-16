@@ -56,10 +56,8 @@ void Game::updateLogic() {
   RevealResult outcome = board.reveal(cursor.x, cursor.y);
   switch (outcome) {
   case RevealResult::Safe:
-    if (checkWin()) {
-      std::cout << "[DEBUG] Game Won" << '\n';
-      state = GameState::FINISHED;
-    };
+    if (isWin())
+      handleWin();
     return;
     break;
   case RevealResult::Invalid:
@@ -67,8 +65,7 @@ void Game::updateLogic() {
     return;
     break;
   case RevealResult::Mine:
-    std::cout << "[DEBUG] Game Lost" << '\n';
-    state = GameState::FINISHED;
+    handleLoss();
     return;
     break;
   }
@@ -82,11 +79,22 @@ void Game::renderFrame() {
   std::cout << frameBuffer.view() << std::flush;
 };
 
-bool Game::checkWin() {
-  std::cout << "[DEBUG] Safe cells:" << board.getRevealedSafeCells() << '\n';
-  std::cout << "[DEBUG] Total cells:" << board.getTotalSafeCells() << '\n';
+bool Game::isWin() {
   return board.getRevealedSafeCells() == board.getTotalSafeCells();
 }
 
-void Game::handleWin() {}
-void Game::handleLoss() {}
+void Game::handleWin() {
+  state = GameState::WON;
+  std::cout << "\r\n  ------------------------"
+            << "\r\n  |       GAME WON       |"
+            << "\r\n  ------------------------"
+            << "\r\n  Press 'q' to exit..." << std::flush;
+}
+void Game::handleLoss() {
+  state = GameState::LOST;
+  board.revealAllMines();
+  std::cout << "\r\n  ------------------------"
+            << "\r\n  |       GAME LOST      |"
+            << "\r\n  ------------------------"
+            << "\r\n  Press 'q' to exit..." << std::flush;
+}

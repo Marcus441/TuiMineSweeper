@@ -45,6 +45,7 @@ public:
   void initialize();
   void toggleFlag();
   RevealResult reveal(int x, int y);
+  void revealAllMines();
 
   const Point &getCursor() const { return cursor; }
   const Cell &getCell(int x, int y) const { return grid.at(y * cols + x); }

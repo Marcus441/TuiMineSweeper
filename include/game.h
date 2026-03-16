@@ -3,7 +3,7 @@
 #include <board.h>
 #include <sstream>
 
-enum class GameState { BEGIN, PLAYING, PAUSED, LOST, FINISHED };
+enum class GameState { BEGIN, PLAYING, PAUSED, LOST, WON, FINISHED };
 
 class Game {
 public:
@@ -25,7 +25,7 @@ private:
   void updateLogic();
   void renderFrame();
 
-  bool checkWin();
+  bool isWin();
   void handleWin();
   void handleLoss();
 };
